@@ -1,31 +1,29 @@
-//Async Await
-console.log("Person 1: Shows Ticket");
-console.log("Person 2: Shows Ticket");
+var form = document.getElementById("my-form");
 
-//Async function always returns a promise. NOTE!!
-const preMovie = async() =>{
-    const promiseWifeBringsTickets = new Promise((reslove, reject)=>{
-        setTimeout(()=>reslove("ticket"), 3000);
+form.addEventListener("submit", appoint);
+
+function appoint(e){
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var phone = document.getElementById("pno").value;
+    var gender = document.getElementById("gender").value;
+    var time = document.getElementById("time").value;
+    
+    //stroing in the local storage 
+    var myObj = {
+        Name: name,
+        Email: email,
+        PhoneNumber : phone,
+        Gender : gender,
+        Time : time
+    };
+    //console.log(localStorage.setItem("myObj", JSON.stringify(myObj)));
+    axios.post("https://crudcrud.com/api/473d344b67cd4ec6913654685fb61b5c/AppointmentData3",myObj)
+    .then((response)=>{
+        console.log(response);
+    })
+    .catch((err)=>{
+        console.log(err);
     });
-    const getPopcorn = new Promise((reslove, reject)=> reslove(`popcorn`));
-
-    const getCandy = new Promise((reslove, reject)=>reslove(`Candy`));
-
-    const getColdDrinks = new Promise((reslove, reject)=> reslove("ColdDrinks"));
-    // Await function can only be used inside async function body!!
-    let ticket;
-    try{
-        ticket = await promiseWifeBringsTickets;
-    }catch(e){
-        ticket = "Sad Face :("
-    }
-    
-    
-    return ticket;
-    
+    alert(name+"Your Booking is Confirmed at"+time+"time");
 }
-
-preMovie().then((m)=>console.log(`Person 3:  ${m}`)); 
-
-console.log("Person 4: Shows Ticket");
-console.log("Person 5: Shows Ticket");
