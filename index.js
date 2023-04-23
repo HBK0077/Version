@@ -1,31 +1,34 @@
-// when submit the data it should be stiored in crudcrud
+// when submit the data it should be stored in crudcrud
 var form = document.getElementById("addForm");
 
 var itemList = document.getElementById("items");
 
 //fetching the data for browser
-axios.get("https://crudcrud.com/api/3d0cdc88b686434b92f0fdff3b5ef711/InventoryData")
-    .then((response)=>{
+    //just to check is there any data already present in the cloud. if true it will display the list in browser.
+const getData = async()=>{
+    try{
+        const response = await axios.get("https://crudcrud.com/api/cb1080d3e7514efb999809be33573b90/InventoryData");
         showOnBrowser(response.data);
-    })
-    .catch((error)=>{
+    }
+    catch{
         console.error(error);
-    });
-
-    function showOnBrowser(show){
-        //
-        var parentNode = itemList;
-        for(var i=0;i<show.length;i++){
+    }
+};
+getData();
+// function show on browser will show the list in the broswer. This is before we insert any data.
+function showOnBrowser(show){
+    var parentNode = itemList;
+    for(var i=0;i<show.length;i++){
            //console.log(show[i]);
         var childNode = `<li id=${show[i]._id}>${show[i].Name}-${show[i].Description}-${show[i].Quantity}-${show[i].Price}
         <button onclick="buy1Product('${show[i]._id}','${show[i].Quantity}','${show[i].Name}','${show[i].Description}','${show[i].Price}')">BUY1</button>
         <button onclick="buy2Product('${show[i]._id}','${show[i].Quantity}','${show[i].Name}','${show[i].Description}','${show[i].Price}')">BUY2</button>
         <button onclick="buy3Product('${show[i]._id}','${show[i].Quantity}','${show[i].Name}','${show[i].Description}','${show[i].Price}')">BUY3</button></li>`
         parentNode.innerHTML = parentNode.innerHTML+childNode;
-        
+        //console.log(`${show[i]._id}`);
+       //window.location.reload();
     }
-    updateInventory(show);
-    //console.log(show[2]);
+    //window.location.reload();
 }
 
 //storing in crudcrud
@@ -45,14 +48,18 @@ function addItem(e){
         Price : itemPrice,
         Quantity : itemQuantity
     };
-    axios.post("https://crudcrud.com/api/3d0cdc88b686434b92f0fdff3b5ef711/InventoryData", obj)
-    .then((response)=>{
-        showOnScreen(response.data);
-    })
-    .catch((error)=>{
-        console.error(error);
-    });
-
+    const showData = async()=>{
+        try{
+            const response = await axios.post("https://crudcrud.com/api/cb1080d3e7514efb999809be33573b90/InventoryData", obj);
+            showOnScreen(response.data);}//Call back function
+        catch{
+            console.error(error);
+        }
+    
+    };
+    showData();
+    
+    //Once we input the values the showOnscreen function will be called so that elements can be shown in the broswer.
     function showOnScreen(show){
         //console.log(show);
         var parentNode = itemList;
@@ -62,14 +69,20 @@ function addItem(e){
         <button onclick="buy2Product('${show._id}','${show.Quantity}','${show.Name}','${show.Description}','${show.Price}')">BUY2</button>
         <button onclick="buy3Product('${show._id}','${show.Quantity}','${show.Name}','${show.Description}','${show.Price}')">BUY3</button></li>`
         parentNode.innerHTML = parentNode.innerHTML+childNode;
-    
+        //console.log(show._id);
+        //window.location.reload();
     }
+    //window.location.reload();
 }
-function buy1Product(key,value,name,description,price){
+
+//These function will update the Quantity and update it in the cloud.
+async function buy1Product(key,value,name,description,price){
+    try{
     //console.log(...show);
     value = value - 1;
     //onsole.log(value);
-    axios.put(`https://crudcrud.com/api/3d0cdc88b686434b92f0fdff3b5ef711/InventoryData/${key}`,
+
+    let response = await axios.put(`https://crudcrud.com/api/cb1080d3e7514efb999809be33573b90/InventoryData/${key}`,
     {
         Name:name,
         Description:description,
@@ -77,73 +90,47 @@ function buy1Product(key,value,name,description,price){
         Price:price
 
     })
-    .then((response)=>{
-        showOnBrowser(response.data);
-        //updateInventory(response.data);
-        //console.log(response);
-    }).catch((error)=>{
+    showOnBrowser(response.data);
+    }catch(error){
         console.log(error);
-    });
+    }
     
 }
-function buy2Product(key,value,name,description,price){
-    //console.log(...show);
-    value = value - 2;
-    //onsole.log(value);
-    axios.put(`https://crudcrud.com/api/3d0cdc88b686434b92f0fdff3b5ef711/InventoryData/${key}`,
-    {
-        Name:name,
-        Description:description,
-        Quantity:value,
-        Price:price
-
-    })
-    .then((response)=>{
+async function buy2Product(key,value,name,description,price){
+    try{
+        //console.log(...show);
+        value = value - 2;
+        //onsole.log(value);
+    
+        let response = await axios.put(`https://crudcrud.com/api/cb1080d3e7514efb999809be33573b90/InventoryData/${key}`,
+        {
+            Name:name,
+            Description:description,
+            Quantity:value,
+            Price:price
+    
+        })
         showOnBrowser(response.data);
-        //console.log(response);
-    }).catch((error)=>{
-        console.log(error);
-    });
-}
-function buy3Product(key,value,name,description,price){
-    //console.log(...show);
-    value = value - 3;
-    //onsole.log(value);
-    axios.put(`https://crudcrud.com/api/3d0cdc88b686434b92f0fdff3b5ef711/InventoryData/${key}`,
-    {
-        Name:name,
-        Description:description,
-        Quantity:value,
-        Price:price
-
-    })
-    .then((response)=>{
-        showOnBrowser(response.data);
-        //console.log(response);
-        updateInventory(response.data);
-    }).catch((error)=>{
-        console.log(error);
-    });
-    function updateInventory(inventory){
-        var parent = itemList;
-        var child = document.getElementById(key);
-        if(child){
-            parent.appendChild(child);
+        }catch(error){
+            console.log(error);
         }
-    }
 }
-
-// function updateInventory(inventory){
-//     var parent = itemList;
-//     var child = document.getElementById(key);
-//     if(child){
-//         parent.appendChild(child);
-//     }
-// }
-
-        // var childNode = `<li id=${inventory._id}>${inventory.Name}-${inventory.Description}-${inventory.Quantity}-${inventory.Price}
-        // <button onclick="buy1Product('${inventory._id}','${show.Quantity}','${inventory.Name}','${inventory.Description}','${inventory.Price}')">BUY1</button>
-        // <button onclick="buy2Product('${inventory._id}','${show.Quantity}','${inventory.Name}','${inventory.Description}','${inventory.Price}')">BUY2</button>
-        // <button onclick="buy3Product('${inventory._id}','${show.Quantity}','${inventory.Name}','${inventory.Description}','${inventory.Price}')">BUY3</button></li>`
-        // parentNode.innerHTML = parentNode.innerHTML+childNode;
-
+async function buy3Product(key,value,name,description,price){
+    try{
+        //console.log(...show);
+        value = value - 3;
+        //onsole.log(value);
+    
+        let response = await axios.put(`https://crudcrud.com/api/cb1080d3e7514efb999809be33573b90/InventoryData/${key}`,
+        {
+            Name:name,
+            Description:description,
+            Quantity:value,
+            Price:price
+    
+        })
+        showOnBrowser(response.data);
+        }catch(error){
+            console.log(error);
+        }
+}
